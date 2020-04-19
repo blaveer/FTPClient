@@ -22,8 +22,11 @@ public class UserPanelEvent {
             WebStatic.port=port;
             WebStatic.username=username;
             WebTree.MyRefresh();
-            FTPInterface.outField.append(count+"连接成功\n");
+            String out=FTPInterface.outField.getText();
+            FTPInterface.outField.setText(out+"连接成功"+count+"\n");
             count++;
+        }else{
+            FTPInterface.outField.setText("连接失败");
         }
         //FTPInterface.webTree.updateUI();
     }

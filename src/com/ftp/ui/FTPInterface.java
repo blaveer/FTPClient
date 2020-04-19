@@ -15,7 +15,9 @@ public class FTPInterface extends JFrame {
     private FMenuBar menuBar=null;
 
     private JScrollPane outPanel=null;
-    public static JTextArea outField=null;
+    //public static JTextArea outField=null;
+    public static JTextPane outField=null;
+
 
     private FileTreeM fileTreeM =null;
 
@@ -47,16 +49,17 @@ public class FTPInterface extends JFrame {
         this.userPanel.setBounds(0, 0, UIStatic.width, UIStatic.height / 30);
         relativeHeight = this.userPanel.getHeight();
         /**输出文本域*/
-        outField = new JTextArea(5, 127);
+        //outField = new JTextArea(5, 127);
+        outField=new JTextPane();
         this.outPanel = new JScrollPane(outField);
-        this.add(outPanel);
         this.outPanel.setBounds(0, relativeHeight, UIStatic.width, UIStatic.height / 7);
-        this.outPanel.add(outField);
         outField.setBounds(0, 0, UIStatic.width, UIStatic.height / 7);
         outField.setSize(UIStatic.width, UIStatic.height / 7);
         outField.setEditable(false);
         outField.setBorder(BorderFactory.createLineBorder(Color.gray, 1));
-        outField.setLineWrap(true);
+        this.outPanel.add(outField);
+        this.add(outPanel);
+        //outField.setLineWrap(true);
         relativeHeight = relativeHeight + outPanel.getHeight();
         /**文件树*/
 //        fileTreeM = new FileTreeM(UIStatic.width, UIStatic.height / 2, "本地站点");
@@ -83,13 +86,13 @@ public class FTPInterface extends JFrame {
         fileTree.setDeleteEnabled(false);
         panelFileTree=new JScrollPane(fileTree);
         this.add(panelFileTree);
-        this.panelFileTree.setBounds(3,relativeHeight,UIStatic.width/2,UIStatic.height/2);
+        this.panelFileTree.setBounds(3,relativeHeight,UIStatic.width/2,UIStatic.height-relativeHeight);
 
         webTree=new WebTree(WebTree.root);
         webTree.setShowHiddenFiles(false);
         panelWebFile=new JScrollPane(webTree);
         this.add(panelWebFile);
-        this.panelWebFile.setBounds(3+fileTreeHead.getWidth(),relativeHeight,UIStatic.width-fileTreeHead.getWidth()-3,UIStatic.height/2);
+        this.panelWebFile.setBounds(3+fileTreeHead.getWidth(),relativeHeight,UIStatic.width-fileTreeHead.getWidth()-3,UIStatic.height-relativeHeight);
 
 
 

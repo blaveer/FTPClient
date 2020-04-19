@@ -2,6 +2,7 @@ package com.ftp.file.tree;
 
 
 import com.ftp.event.UserPanelEvent;
+import com.ftp.ui.FTPInterface;
 import com.ftp.web.file.WebStatic;
 
 import javax.swing.*;
@@ -12,8 +13,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.time.LocalDate;
 
+import static com.ftp.Main.showWarning;
 import static com.ftp.util.FtpUtil.uploadFile;
+import static com.ftp.web.file.WebStatic.ftpClient;
 import static com.ftp.web.file.WebStatic.ftpUploadFileName;
 
 /**
@@ -67,8 +71,12 @@ public class FileTreeListener extends MouseAdapter {
         upload.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                if(ftpClient==null){
+                    return;
+                }
                 DefaultMutableTreeNode clickNode=(DefaultMutableTreeNode)treePath.getLastPathComponent();
                 if(clickNode.getChildCount()!=0){
+                    showWarning("请选择单个文件\n不可选择文件夹");
                     System.out.println("点击了文件夹");
                     return;
                 }
@@ -86,17 +94,23 @@ public class FileTreeListener extends MouseAdapter {
                             new File(localPath)
                     );
                 }catch (FileNotFoundException e){
-                    System.out.println("上传的文件找不到");
+                    showWarning("上传的文件找不到");
                     return;
                 }catch (Exception e){
                     System.out.println("上传文件时创建输入流发生储物");
                     return;
                 }
-                boolean ret=uploadFile(WebStatic.ftpClient,WebStatic.ftpBasicPath,"",ftpUploadFileName,inputStream);
+                LocalDate currentTime = LocalDate.now();
+                String loudPath="\\"+currentTime;
+                boolean ret=uploadFile(WebStatic.ftpClient,WebStatic.ftpBasicPath,loudPath,ftpUploadFileName,inputStream);
                 if(ret){
                     UserPanelEvent.connectClick(WebStatic.host,WebStatic.username,WebStatic.password,WebStatic.port);
+                    String out= FTPInterface.outField.getText();
+                    FTPInterface.outField.setText(out+"上传文件"+ftpUploadFileName+"成功"+"\n");
                 }else{
                     //TODO 上传失败的处理
+                    String out= FTPInterface.outField.getText();
+                    FTPInterface.outField.setText(out+"上传文件"+ftpUploadFileName+"失败"+"\n");
                 }
             }
         });

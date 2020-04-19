@@ -7,41 +7,29 @@ import org.apache.commons.net.ftp.FTPFile;
 
 import javax.swing.*;
 import java.io.*;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.Set;
+
 import static com.ftp.ui.UIStatic.getScreen;
 import static com.ftp.util.FtpUtil.getFTPClient;
+import static com.ftp.web.file.WebStatic.baseDownloadPath;
+import static com.ftp.web.file.WebStatic.ftpBasicPath;
 
 /**
  * @author 86187
  */
 public class Main {
     public static FTPInterface ftp;
-    public static void main(String[] a) throws FileNotFoundException {
+    public static void main(String[] a) {
         frame();
-        //getFile();
-        //IP
-        /*String ftpHost = "192.168.1.5";
-        //端口号，没改过
-        int ftpPort = 21;
-        //用户名
-        String ftpUserName = "ftp";
-        //ftp����������
-        String ftpPassword = "ftp";
-        //ftp������·��
-        String ftpPath = "1/";
-        //����·��
-        String localPath = "D:\\FTP\\LocalFTP\\";
-        //�ļ���
-        String fileName = "my.txt";
-        *//*FtpUtil.deleteFile(ftpHost, ftpPort, ftpUserName, ftpPassword,ftpPath, fileName);*//*
-        InputStream inputStream=new FileInputStream(new File(localPath+"my.txt"));
-        boolean r=FtpUtil.uploadFile(ftpHost, ftpPort, ftpUserName, ftpPassword, ftpPath, "upload/", "my.txt", inputStream);
-        System.out.println(r);*/
     }
 
     private static void frame() {
         init();
         ftp=new FTPInterface();
     }
+
 
     public static void getFile(){
         FTPClient f=getFTPClient("192.168.1.5",21,"ftp","ftp");
@@ -94,7 +82,41 @@ public class Main {
 
 
     private static void init(){
+        setting();
         getScreen();
+    }
+    private static void setting(){
+        String path=null;
+        String ftpPath=null;
+        String filePath="src/com/ftp/properties/setting.properties";
+        try{
+            Properties p=new Properties();
+            File fileIn=new File(filePath);
+            p.load(new FileInputStream(fileIn));
+            Set<String> pSet = p.stringPropertyNames();
+            Iterator i = pSet.iterator();
+            while (i.hasNext()) {
+                String propertiesName = i.next().toString();
+                if ("baseDownloadPath".equalsIgnoreCase(propertiesName)){
+                    path=p.getProperty(propertiesName);
+                    continue;
+                }
+                if("ftpBasicPath".equalsIgnoreCase(propertiesName)){
+                    ftpPath=p.getProperty(propertiesName);
+                    continue;
+                }
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+        }catch (Exception e){
+            System.out.println("主函数设置未知错误");
+        }
+        if(path!=null){
+            baseDownloadPath=path;
+        }
+        if(ftpPath!=null){
+            ftpBasicPath=ftpPath;
+        }
     }
     public static void showWarning(String warningInfo){
         JOptionPane.showMessageDialog(ftp,warningInfo,"警告",1);

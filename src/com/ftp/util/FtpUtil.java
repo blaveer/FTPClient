@@ -17,6 +17,8 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 
+import static com.ftp.Main.showWarning;
+
 /**
  * ftp工具类
  * @author lijj
@@ -290,6 +292,10 @@ public class FtpUtil {
                 return result;
             }
             // 切换到上传目录
+            if(!ftpClient.changeWorkingDirectory(basePath)){
+                showWarning("请先选择默认的上传基础路径");
+                return false;
+            }
             if (!ftpClient.changeWorkingDirectory(basePath + filePath)) {
                 // 如果目录不存在创建目录
                 String[] dirs = filePath.split("/");
@@ -440,7 +446,7 @@ public class FtpUtil {
         ByteArrayOutputStream swapStream = new ByteArrayOutputStream();
         byte[] buff = new byte[100];
         int rc = 0;
-        while ((rc = inStream.read(buff, 0, 100)) > 0) {
+            while ((rc = inStream.read(buff, 0, 100)) > 0) {
             swapStream.write(buff, 0, rc);
         }
         byte[] in2b = swapStream.toByteArray();

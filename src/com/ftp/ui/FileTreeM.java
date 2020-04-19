@@ -11,6 +11,7 @@ import static javax.swing.SpringLayout.NORTH;
 /**
  * @author 86187
  * @function 显示本地和服务器的文件结构
+ * 这个类也没应用到
  */
 public class FileTreeM extends JPanel{
     //TODO 鉴于本地和服务器的pop菜单不同，可能还要再继承一下

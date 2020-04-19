@@ -13,6 +13,7 @@ import static com.ftp.event.UserPanelEvent.connectClick;
 
 /**
  * @author 86187
+ *
  */
 public class UserPanel extends JPanel {
     private int height;
