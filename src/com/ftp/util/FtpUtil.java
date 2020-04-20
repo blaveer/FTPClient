@@ -21,7 +21,7 @@ import static com.ftp.Main.showWarning;
 
 /**
  * ftp工具类
- * @author lijj
+ * @author 86187
  */
 
 public class FtpUtil {
@@ -80,7 +80,7 @@ public class FtpUtil {
     }
 
     /**
-     * 从FTP服务器下载文件
+     * 从FTP服务器下载文件，测试函数，下面有一个重载的使用函数，参数改为FTPClient对象
      *
      * @param ftpHost FTP IP地址
      *
@@ -115,6 +115,7 @@ public class FtpUtil {
             // 上传文件
             //对中文文件名进行转码，否则中文名称的文件下载失败
             String fileNameTemp = new String(fileName.getBytes(LOCAL_CHARSET), SERVER_CHARSET);
+
             ftpClient.changeWorkingDirectory(ftpPath);
 
             InputStream retrieveFileStream = ftpClient.retrieveFileStream(fileNameTemp);
@@ -132,17 +133,21 @@ public class FtpUtil {
             if(null != retrieveFileStream){
                 retrieveFileStream.close();
             }
-        } catch (FileNotFoundException e) {
+        }
+        catch (FileNotFoundException e) {
             logger.error("没有找到" + ftpPath + "文件");
             e.printStackTrace();
-        } catch (SocketException e) {
+        }
+        catch (SocketException e) {
             logger.error("连接FTP失败.");
             e.printStackTrace();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
             logger.error("文件读取错误。");
             e.printStackTrace();
-        } finally {
+        }
+        finally {
 
             if (ftpClient.isConnected()) {
                 try {
@@ -190,9 +195,11 @@ public class FtpUtil {
             logger.error("文件读取错误。");
             e.printStackTrace();
         } finally {
-
+            /**这个函数大部分直接copy的上面的那个函数，finally 部分是析构FTPClient对象的*/
         }
     }
+
+
     /**
      * Description: 向FTP服务器上传文件
      *
@@ -226,9 +233,12 @@ public class FtpUtil {
                 ftpClient.disconnect();
                 return result;
             }
-            // 切换到上传目录
+            /**切换到上传目录
+             * bathPath是基础路径，连接后面的一块是完整路径
+             * */
             if (!ftpClient.changeWorkingDirectory(basePath + filePath)) {
                 // 如果目录不存在创建目录
+                /**这里默认是有基础路径的*/
                 String[] dirs = filePath.split("/");
                 String tempPath = basePath;
                 for (String dir : dirs) {
@@ -245,6 +255,7 @@ public class FtpUtil {
                     }
                 }
             }
+
             // 设置上传文件的类型为二进制类型
             // 开启服务器对UTF-8的支持，如果服务器支持就用UTF-8编码，否则就使用本地编码（GBK）.
             if (FTPReply.isPositiveCompletion(ftpClient.sendCommand("OPTS UTF8", "ON"))) {
@@ -256,15 +267,14 @@ public class FtpUtil {
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
             // 上传文件
             filename = new String(filename.getBytes(LOCAL_CHARSET), SERVER_CHARSET);
+            /**这里没有再写函数，直接调用的storeFile函数使用的*/
             if (!ftpClient.storeFile(filename, input)) {
-                System.out.println("输出"+result);
+                //System.out.println("输出"+result);
                 return result;
             }
-
             if(null != input){
                 input.close();
             }
-
             result = true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -364,8 +374,8 @@ public class FtpUtil {
      *            要删除的文件名称
      * @return
      */
-    public static boolean deleteFile(String ftpHost, int ftpPort, String ftpUserName, String ftpPassword, String pathname,
-                                     String filename) {
+    public static boolean deleteFile(String ftpHost, int ftpPort, String ftpUserName, String ftpPassword,
+                                     String pathname, String filename) {
         boolean flag = false;
         FTPClient ftpClient = new FTPClient();
         try {
@@ -376,6 +386,7 @@ public class FtpUtil {
                 return flag;
             }
             // 切换FTP目录
+            /**下面代码都是copy上面的，没改*/
             ftpClient.changeWorkingDirectory(pathname);
             // 设置上传文件的类型为二进制类型
             if (FTPReply.isPositiveCompletion(ftpClient.sendCommand("OPTS UTF8", "ON"))) {// 开启服务器对UTF-8的支持，如果服务器支持就用UTF-8编码，否则就使用本地编码（GBK）.
@@ -441,8 +452,11 @@ public class FtpUtil {
         return new ByteArrayInputStream(buf);
     }
 
-    // 将输入流转为byte[]
+    /**将输入流转为byte[]
+     * 将错误抛出，由调用者统一处理
+     * */
     public static final byte[] input2byte(InputStream inStream) throws IOException {
+        /**测试过程中，发现大部分报错都是在这报的错，*/
         ByteArrayOutputStream swapStream = new ByteArrayOutputStream();
         byte[] buff = new byte[100];
         int rc = 0;
@@ -453,7 +467,12 @@ public class FtpUtil {
         return in2b;
     }
 
-    // 将byte[]转为文件
+    /**
+     * @function 将byte[]转为文件
+     * @param buf 从服务器下载的之后的文件，已经转为二进制流的
+     * @param filePath 文件存储的本地路径
+     * @param fileName
+     **/
     public static void byte2File(byte[] buf, String filePath, String fileName) {
         BufferedOutputStream bos = null;
         FileOutputStream fos = null;
@@ -463,9 +482,13 @@ public class FtpUtil {
             if (!dir.exists() && dir.isDirectory()) {
                 dir.mkdirs();
             }
+            /**创建文件*/
             file = new File(filePath + File.separator + fileName);
+            /**创建输出流*/
             fos = new FileOutputStream(file);
+            /**创建二进制流*/
             bos = new BufferedOutputStream(fos);
+            /**将二进制写入输出流中*/
             bos.write(buf);
         } catch (Exception e) {
             e.printStackTrace();
@@ -484,8 +507,10 @@ public class FtpUtil {
                     e.printStackTrace();
                 }
             }
+            /**上面的两个if语句块中都没有报错的话，就完成了*/
         }
     }
+
     public static boolean uploadFile2(String ftpHost, String ftpUserName,
                                      String ftpPassword, int ftpPort, String ftpPath,
                                      String fileName,InputStream input) {
